@@ -1,30 +1,66 @@
 import express from 'express';
-import mysql from 'mysql2/promise';
+import path from 'path';
+import mysql from 'mysql2';
+import { runTestQuery } from './db/querys/testQuery';
+import {fetchQuizMacroQuery} from './db/querys/fetchMacroTPQuery'
+import dotenv from 'dotenv'
+dotenv.config();
 
-// Crea l'app Express
-const app = express();
-const port = 3000;
+const app=express();
+const PORT=3000;
 
-// Connessione al database MySQL
-const dbConfig = {
-  host: 'localhost',
-  user: 'root',
-  password: 'password',
-  database: 'test'
-};
 
-async function connectToDatabase() {
-  const connection = await mysql.createConnection(dbConfig);
-  console.log('Connesso al database MySQL!');
-  return connection;
-}
+//---------------------- dichiarazione dei MIDDLEWARE -----------------------------------
+app.use(express.static(path.join(__dirname, 'public')));
+app.use(express.json());
 
-app.get('/', async (req, res) => {
-  const connection = await connectToDatabase();
-  const [rows] = await connection.query('SELECT * FROM users');
-  res.json(rows);
-});
+//---------------------------------------------------------------------------------------
 
-app.listen(port, () => {
-  console.log(`Server in ascolto su http://localhost:${port}`);
+//------------------------- DATABASE ----------------------------------------------------
+const myPool= mysql.createPool({
+  host: process.env.DB_HOST,           // Assicurati di avere queste variabili nell'.env
+  user: process.env.DB_USER,           
+  password: process.env.DB_PASSWORD,   
+  database: process.env.DB_DATABASENAME,
+  waitForConnections: true,
+  connectionLimit:10,
+}).promise()
+
+/* async function runQuery() {
+  try {
+    const [testResult,testFields] = await myPool.query("SELECT * FROM macrotopic");
+    console.log(testResult);
+  } catch (err) {
+    console.error('Error executing query:', err);
+  }
+} */
+
+//runTestQuery(myPool)
+
+
+//---------------------------------------------------------------------------------------
+
+
+
+app.get('/',(_,res)=>{
+  res.sendFile(path.join(__dirname,'htmlPages/index.html'))
+})
+
+app.get('/api/test',(_,res)=>{
+  console.log('ricevuta una get dal client'); 
+  res.json({ response: {
+      'messaggio':'Ricevuto il messaggio dal client!',
+      'contenuto':'prototipo del contenuto'
+    }
+  });
+})
+
+app.post('/api/test',(req,res)=>{
+  console.log('sono stato contattato')
+  //console.log(req.body);  
+  fetchQuizMacroQuery(myPool,req,res); 
+})
+
+app.listen(PORT, () => {
+  console.log(`Server avviato su http://localhost:${PORT}`);
 });

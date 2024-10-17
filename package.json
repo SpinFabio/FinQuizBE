@@ -5,8 +5,7 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "dev": "nodemon ./src/index.ts",
-    "db:create": "npx sequelize db:create && npx sequelize db:migrate"
+    "dev": "nodemon ./src/index.ts"
   },
   "keywords": [],
   "author": "",
