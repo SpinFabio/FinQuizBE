@@ -1,8 +1,6 @@
-import express from 'express';
+import express, { Request, Response, NextFunction } from 'express';
 import path from 'path';
 import mysql from 'mysql2';
-import { runTestQuery } from './db/querys/testQuery';
-import {fetchQuizMacroQuery} from './db/querys/fetchMacroTPQuery'
 import dotenv from 'dotenv'
 dotenv.config();
 
@@ -13,7 +11,10 @@ const PORT=3000;
 //---------------------- dichiarazione dei MIDDLEWARE -----------------------------------
 app.use(express.static(path.join(__dirname, 'public')));
 app.use(express.json());
-
+app.use((err: Error, req: Request, res: Response, next: NextFunction) => {
+  console.error(err.stack);
+  res.status(500).json({ message: 'Something broke!', error: err.message });
+});
 //---------------------------------------------------------------------------------------
 
 //------------------------- DATABASE ----------------------------------------------------
@@ -26,40 +27,24 @@ const myPool= mysql.createPool({
   connectionLimit:10,
 }).promise()
 
-/* async function runQuery() {
-  try {
-    const [testResult,testFields] = await myPool.query("SELECT * FROM macrotopic");
-    console.log(testResult);
-  } catch (err) {
-    console.error('Error executing query:', err);
-  }
-} */
-
-//runTestQuery(myPool)
-
-
 //---------------------------------------------------------------------------------------
 
+
+//------------------------- Routers ------------------------------------------------------
+
+import {createMacroRouter} from './routes/macro';
+app.use('/api/macro', createMacroRouter(myPool));
+
+import {createTestRouter} from './routes/test'
+app.use('/api/test', createTestRouter(myPool))
+
+//---------------------------------------------------------------------------------------
 
 
 app.get('/',(_,res)=>{
   res.sendFile(path.join(__dirname,'htmlPages/index.html'))
 })
 
-app.get('/api/test',(_,res)=>{
-  console.log('ricevuta una get dal client'); 
-  res.json({ response: {
-      'messaggio':'Ricevuto il messaggio dal client!',
-      'contenuto':'prototipo del contenuto'
-    }
-  });
-})
-
-app.post('/api/test',(req,res)=>{
-  console.log('sono stato contattato')
-  //console.log(req.body);  
-  fetchQuizMacroQuery(myPool,req,res); 
-})
 
 app.listen(PORT, () => {
   console.log(`Server avviato su http://localhost:${PORT}`);

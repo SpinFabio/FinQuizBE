@@ -32,7 +32,7 @@ export async function fetchQuizMacroQuery(
 ) {
   try {
     const macroTopicRequest = req.body as MacroTopicRequest;
-    console.log(macroTopicRequest);
+    //console.log(macroTopicRequest);
   
     if (!macroTopicRequest || !macroTopicRequest.arrayMacrotopic) {
       return res.status(400).send('Bad request: Missing required fields');
@@ -51,17 +51,17 @@ export async function fetchQuizMacroQuery(
       results.push(...quizzes); 
     }
     
-    console.log('result 1: ')
-    console.log(results);
+    //console.log('result 1: ')
+    //console.log(results);
     
     const resultsForFE: QuizBase[] = [];
     for (const quiz of results) {
       resultsForFE.push(quizDBToQuizFE(quiz)); // Usa la funzione di conversione
     }
 
-    console.log('result for frontend: ')
-    console.log(resultsForFE)
-    
+    //console.log('result for frontend: ')
+    //console.log(resultsForFE)
+    console.log('query macro db finita')
     res.json({
       response: {
         message: 'Ecco qui il risultato della query',
