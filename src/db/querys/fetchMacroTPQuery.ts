@@ -3,27 +3,14 @@ import { Pool, RowDataPacket } from 'mysql2/promise';
 import {MacroTopicResponse,MacroTopicRequest, MacroTopicBase} from '../../common-interfaces/macro-topic-interfaces'
 import { QuizBase,QuizDB } from "../../common-interfaces/quiz-interface";
 import {quizDBToQuizFE} from './../utils-functions/quiz-convert'
+import dotenv from 'dotenv';
 
-export async function fetchMacroTPQuery(myPool: Pool, res?: Response) {
-  try {
-    const [testResults,_] = await myPool.query<RowDataPacket[]>(`
-      SELECT * 
-      FROM 
-      `);
-    //console.log(testResults); // ricordati di toglierlo quando finisci di debuggare
+dotenv.config()
 
-    if (res !== undefined) {
-      res.json({
-        response: {
-          message: 'Ecco qui il risultato della query',
-          data: testResults,
-        },
-      });
-    }
-  } catch (err) {
-    console.error('Error executing test query:', err);
-  }
-}
+const QUIZ_LIMIT= parseInt(process.env.QUIZ_LIMIT || '100')
+const MACROTOPIC_LIMIT= parseInt(process.env.MACROTOPIC_LIMIT || '5')
+
+
 
 export async function fetchQuizMacroQuery(
   myPool: Pool, 
@@ -37,16 +24,34 @@ export async function fetchQuizMacroQuery(
     if (!macroTopicRequest || !macroTopicRequest.arrayMacrotopic) {
       return res.status(400).send('Bad request: Missing required fields');
     }
-    
+
     const results: QuizDB[] = [];
     for (const macroTopic of macroTopicRequest.arrayMacrotopic) {
+      if (
+        !Number.isInteger(macroTopic.macroID) || 
+        macroTopic.macroID <= 0 || 
+        macroTopic.macroID > MACROTOPIC_LIMIT
+      ) {
+        return res.status(400).send('Invalid macroTopic ID: The ID must be a positive integer within the allowed range.');
+      }
+      
+      if (
+        !Number.isInteger(macroTopic.quantitySelected) || 
+        macroTopic.quantitySelected <= 0
+      ) {
+        return res.status(400).send('Invalid quantity selected: The quantity must be a positive integer greater than zero.');
+      }
+      
+      
+      const quantitySelected= Math.min(macroTopic.quantitySelected,QUIZ_LIMIT)
       const [rows] = await myPool.query<RowDataPacket[]>(`
         SELECT *
         FROM quiz
         WHERE macroTopicId = ?
         ORDER BY RAND()
         LIMIT ?;
-      `, [macroTopic.macroID, macroTopic.quantitySelected]);  
+      `, [macroTopic.macroID, quantitySelected]);  
+
       const quizzes = rows as QuizDB[];
       results.push(...quizzes); 
     }
@@ -72,5 +77,29 @@ export async function fetchQuizMacroQuery(
   } catch (err) {
     console.error('Error: ', err);
     res.status(500).send('Internal server error');
+  }
+}
+
+
+
+
+export async function fetchMacroTPQuery(myPool: Pool, res?: Response) {
+  try {
+    const [testResults,_] = await myPool.query<RowDataPacket[]>(`
+      SELECT * 
+      FROM 
+      `);
+    //console.log(testResults); // ricordati di toglierlo quando finisci di debuggare
+
+    if (res !== undefined) {
+      res.json({
+        response: {
+          message: 'Ecco qui il risultato della query',
+          data: testResults,
+        },
+      });
+    }
+  } catch (err) {
+    console.error('Error executing test query:', err);
   }
 }

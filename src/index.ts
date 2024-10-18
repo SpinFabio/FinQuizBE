@@ -2,6 +2,8 @@ import express, { Request, Response, NextFunction } from 'express';
 import path from 'path';
 import mysql from 'mysql2';
 import dotenv from 'dotenv'
+import rateLimit from 'express-rate-limit';
+
 dotenv.config();
 
 const app=express();
@@ -13,8 +15,16 @@ app.use(express.static(path.join(__dirname, 'public')));
 app.use(express.json());
 app.use((err: Error, req: Request, res: Response, next: NextFunction) => {
   console.error(err.stack);
-  res.status(500).json({ message: 'Something broke!', error: err.message });
+  res
+    .status(500)
+    .json({ message: 'Something broke!', error: err.message });
 });
+app.use( // il limitatore di richieste globale
+  rateLimit({
+    windowMs: 60 * 1000, 
+    max: 100,            
+    message: 'Troppe richieste, riprova più tardi.',
+  }))
 //---------------------------------------------------------------------------------------
 
 //------------------------- DATABASE ----------------------------------------------------
@@ -41,10 +51,10 @@ app.use('/api/test', createTestRouter(myPool))
 //---------------------------------------------------------------------------------------
 
 
-app.get('/',(_,res)=>{
+/* app.get('/',(_,res)=>{
   res.sendFile(path.join(__dirname,'htmlPages/index.html'))
 })
-
+ */
 
 app.listen(PORT, () => {
   console.log(`Server avviato su http://localhost:${PORT}`);
