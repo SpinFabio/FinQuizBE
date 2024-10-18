@@ -10,22 +10,28 @@
   <h1>Benvenuto nella mia app Express!</h1>
   <p>Questa è una semplice pagina HTML servita da Express.</p>
   <input type="text" id="inputUrl">
+  <input type="text" id="inputhttpMethod">
+  
   <button id="bottonerichiesta">Fai Richiesta al server</button>
+  
   <script type="module">
+    
     import { POST_MACROREQUEST } from '/requestOptions.js';
 
     document.getElementById('inputUrl').value = POST_MACROREQUEST.url;
+    document.getElementById('inputhttpMethod').value= POST_MACROREQUEST.options.method;
 
     document.getElementById('bottonerichiesta').addEventListener('click', () => {
       const url = document.getElementById('inputUrl').value;
-      
-      console.log('bottone premuto con URL: ', url);
+      const met = document.getElementById('inputhttpMethod').value 
+      console.log(`bottone premuto con URL: ${url} e method: ${met}`);
       
       fetch(url, POST_MACROREQUEST.options)
         .then(response => response.json())
         .then(data => console.log(data))  
         .catch(err => console.log('ERRORE: ', err));
     });
+
   </script>
 </body>
 </html>

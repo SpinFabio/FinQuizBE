@@ -1,5 +1,5 @@
 import  express  from "express";
-import {fetchQuizMacroQuery} from '../db/querys/fetchMacroTPQuery'
+import {fetchQuizMacroQuery} from '../db/querys/fetchMacroQuery'
 import {Pool} from 'mysql2/promise'
 import rateLimit from 'express-rate-limit';
 
@@ -8,9 +8,11 @@ import rateLimit from 'express-rate-limit';
 export const createMacroRouter= (myPool:Pool)=>{
   const router=express.Router();
 
+  //----------------------- Middleware -------------------------------------------------------------
+  
   router
     .use((req,_,next)=>{
-      console.log(`Richiesta alla rotta: ${req.originalUrl}`)
+      console.log(`Richiesta alla rotta: ${req.originalUrl}`) 
       next()
     })
     .use(rateLimit({
@@ -20,6 +22,9 @@ export const createMacroRouter= (myPool:Pool)=>{
       standardHeaders: true,
       legacyHeaders: false,
     }))
+
+  //-----------------------------------------------------------------------------------------------
+
 
 
   router.post('/',(req,res)=>{
