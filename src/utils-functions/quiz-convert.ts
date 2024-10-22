@@ -1,4 +1,4 @@
-import { QuizBase,QuizDB } from "../../common-interfaces/quiz-interface";
+import { QuizBase,QuizDB } from "../common-interfaces/quiz-interface";
 
 export function quizDBToQuizFE(quizDB: QuizDB): QuizBase {
   return {

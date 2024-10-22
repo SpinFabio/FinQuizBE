@@ -1,48 +1,32 @@
 import { Request, Response } from 'express';
 import { Pool, RowDataPacket } from 'mysql2/promise';
-import { MacroTopicResponse, MacroTopicRequest } from '../../common-interfaces/macro-topic-interfaces'
+import { MacroTopicResponse, MacroTopicRequest, MacroTopicBase } from '../../common-interfaces/macro-topic-interfaces';
 import { QuizBase,QuizDB } from "../../common-interfaces/quiz-interface";
-import {quizDBToQuizFE} from '../utils-functions/quiz-convert'
-import dotenv from 'dotenv';
+import { quizDBToQuizFE } from '../../utils-functions/quiz-convert'
 
-dotenv.config()
 
-const QUIZ_LIMIT= parseInt(process.env.QUIZ_LIMIT || '100')
-const MACROTOPIC_LIMIT= parseInt(process.env.MACROTOPIC_LIMIT || '5')
-
+const QUIZ_LIMIT = parseInt( process.env.QUIZ_LIMIT!)
+const MACROTOPIC_LIMIT = parseInt( process.env.MACROTOPIC_LIMIT!)
+const MACROTOPIC_ARRAY_LIMIT = parseInt(process.env.MACROTOPIC_ARRAY_LIMIT!)
 
 
 export async function fetchQuizMacroQuery(
   myPool: Pool, 
   req: Request, 
   res: Response
-) {
+){
   try {
     const macroTopicRequest = req.body as MacroTopicRequest;
-    //console.log(macroTopicRequest);
   
-    if (!macroTopicRequest || !macroTopicRequest.arrayMacrotopic) {
-      return res.status(400).send('Bad request: Missing required fields');
-    }
+    macroTopicRequestCheck(macroTopicRequest,res)
 
     const results: QuizDB[] = [];
     for (const macroTopic of macroTopicRequest.arrayMacrotopic) {
-      if (
-        !Number.isInteger(macroTopic.macroID) || 
-        macroTopic.macroID <= 0 || 
-        macroTopic.macroID > MACROTOPIC_LIMIT
-      ) {
-        return res.status(400).send('Invalid macroTopic ID: The ID must be a positive integer within the allowed range.');
+      
+      macroTopicCheck(macroTopic,res)
+      if(!macroTopic.isChecked){
+        break;
       }
-      
-      if (
-        !Number.isInteger(macroTopic.quantitySelected) || 
-        macroTopic.quantitySelected <= 0
-      ) {
-        return res.status(400).send('Invalid quantity selected: The quantity must be a positive integer greater than zero.');
-      }
-      
-      
       const quantitySelected= Math.min(macroTopic.quantitySelected,QUIZ_LIMIT)
       const [rows] = await myPool.query<RowDataPacket[]>(`
         SELECT *
@@ -80,6 +64,32 @@ export async function fetchQuizMacroQuery(
   }
 }
 
+function macroTopicRequestCheck(macroTopicRequest:MacroTopicRequest, res:Response){
+  if (!macroTopicRequest || !macroTopicRequest.arrayMacrotopic) {
+    return res.status(400).send('Bad request: Missing required fields');
+  }
+  if(macroTopicRequest.arrayMacrotopic.length>MACROTOPIC_ARRAY_LIMIT){
+    return res.status(400).send('Bad request: Too many macro topic elements');
+  }
+}
+
+function macroTopicCheck(macroTopic:MacroTopicBase, res: Response){
+  if (
+    !Number.isInteger(macroTopic.macroID) || 
+    macroTopic.macroID <= 0 || 
+    macroTopic.macroID > MACROTOPIC_LIMIT
+  ) {
+    return res.status(400).send('Invalid macroTopic ID: The ID must be a positive integer within the allowed range.');
+  }
+  
+  if (
+    !Number.isInteger(macroTopic.quantitySelected) || 
+    macroTopic.quantitySelected <= 0
+  ) {
+    return res.status(400).send('Invalid quantity selected: The quantity must be a positive integer greater than zero.');
+  }
+  
+}
 
 
 
