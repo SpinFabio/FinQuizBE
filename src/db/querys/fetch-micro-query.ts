@@ -47,8 +47,8 @@ export async function fetchQuizMicroQuery(
     const resultsForFE: QuizBase[] = results.map(quiz=>quizDBToQuizFE(quiz))
     
     
-    console.log('result for frontend: ')
-    console.log(resultsForFE)
+    //console.log('result for frontend: ')
+    //console.log(resultsForFE)
 
     res.json({
       message: 'ecco qui il risultato ella query micro',
@@ -73,18 +73,22 @@ function microTopicRequestCheck(microTopicRequest: MicrotopicRequest):boolean{
 }
 
 function microTopicCheck(microTopic:MicroTopicBase):boolean{
+  const macroID = microTopic.macroID
+  const microID= microTopic.microID
+  const remainer= microID%(macroID*100)
+
   if(
     !Number.isInteger(microTopic.macroID)||
-    microTopic.macroID<=0||
-    microTopic.macroID>MACROTOPIC_LIMIT
+    macroID<=0||
+    macroID>MACROTOPIC_LIMIT
   ){
     return false
   }
 
   if(
     !Number.isInteger(microTopic.microID)||
-    microTopic.microID<=0||
-    microTopic.microID>MICROTOPIC_LIMIT
+    microID<=0||
+    microID>MICROTOPIC_LIMIT
   ){
     return false
   }
@@ -92,6 +96,14 @@ function microTopicCheck(microTopic:MicroTopicBase):boolean{
   if(
     !Number.isInteger(microTopic.quantitySelected)||
     microTopic.quantitySelected<=0
+  ){
+    return false
+  }
+  
+
+  if(
+    remainer==0 ||
+    remainer>100
   ){
     return false
   }
