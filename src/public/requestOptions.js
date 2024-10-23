@@ -31,7 +31,7 @@ export const POST_TEST={
 
 
 export const POST_MACROREQUEST = {
-  url: '/api/test/',
+  url: '/api/macro/',
   options: {
     method: 'POST',
     headers: {

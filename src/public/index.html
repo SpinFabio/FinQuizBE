@@ -4,29 +4,47 @@
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="style.css">
     <title>Home Page</title>
 </head>
 <body>
   <h1>Benvenuto nella mia app Express!</h1>
   <p>Questa è una semplice pagina HTML servita da Express.</p>
+  
   <input type="text" id="inputUrl">
   <input type="text" id="inputhttpMethod">
-  
   <button id="bottonerichiesta">Fai Richiesta al server</button>
   
+  <br>
+  <textarea id="inputJSONElement" spellcheck="false"></textarea>
+
   <script type="module">
     
-    import { POST_MACROREQUEST } from '/requestOptions.js';
+    import { POST_MACROREQUEST as REQ } from '/requestOptions.js';
 
-    document.getElementById('inputUrl').value = POST_MACROREQUEST.url;
-    document.getElementById('inputhttpMethod').value= POST_MACROREQUEST.options.method;
+    
+    const optionsFormatted = {
+      ...REQ.options,  
+      body: JSON.parse(REQ.options.body)    
+    };
+
+    document.getElementById('inputUrl').value = REQ.url;
+    document.getElementById('inputhttpMethod').value= REQ.options.method;
+    document.getElementById('inputJSONElement').value = JSON.stringify(optionsFormatted, null, 4);
+    
+    
 
     document.getElementById('bottonerichiesta').addEventListener('click', () => {
       const url = document.getElementById('inputUrl').value;
       const met = document.getElementById('inputhttpMethod').value 
       console.log(`bottone premuto con URL: ${url} e method: ${met}`);
+
+      REQ.url=url
       
-      fetch(url, POST_MACROREQUEST.options)
+      console.log(`Request: `)
+      console.log(REQ)
+      
+      fetch(REQ.url, REQ.options)
         .then(response => response.json())
         .then(data => console.log(data))  
         .catch(err => console.log('ERRORE: ', err));

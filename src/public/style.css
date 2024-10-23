@@ -1,0 +1,11 @@
+#inputJSONElement {
+  color: blue;
+  width: 100%;  /* Larghezza a tua scelta */
+  height: 1000px;  /* Altezza automatica */
+  resize: none;  /* Per disabilitare il ridimensionamento se non necessario */
+  padding: 10px;  /* Spaziatura interna */
+  box-sizing: border-box;  /* Per includere padding nel calcolo della larghezza */
+  font-family: Arial, sans-serif;  /* Font a tua scelta */
+  font-size: 14px;  /* Dimensione del font */
+  overflow-y: hidden; /* Nasconde la barra di scorrimento verticale */
+}

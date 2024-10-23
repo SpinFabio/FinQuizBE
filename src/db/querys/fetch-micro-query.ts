@@ -1,11 +1,15 @@
 import { Request, Response } from 'express';
 import { Pool, RowDataPacket } from 'mysql2/promise';
-import { MicrotopicRequest,MicroTopicBase } from '../../common-interfaces/micro-topic-interfaces';
-import { QuizDB } from '../../common-interfaces/quiz-interface';
+import { MicrotopicRequest,MicroTopicBase, MicroTopicResponse } from '../../common-interfaces/micro-topic-interfaces';
+import { QuizBase, QuizDB } from '../../common-interfaces/quiz-interface';
+import { quizDBToQuizFE } from '../../utils-functions/quiz-convert';
+import dotenv from 'dotenv';
 
+dotenv.config();
 const QUIZ_LIMIT = parseInt(process.env.QUIZ_LIMIT!)
 const MACROTOPIC_LIMIT = parseInt(process.env.MACROTOPIC_LIMIT!)
-const MICROTOPIC_LIMIT= parseInt(process.env.MACROTOPIC_LIMIT!)
+const MICROTOPIC_LIMIT= parseInt(process.env.MICROTOPIC_LIMIT!)
+const MICROTOPIC_ARRAY_LIMIT = parseInt(process.env.MICROTOPIC_ARRAY_LIMIT!)
 
 export async function fetchQuizMicroQuery( 
   myPool: Pool, 
@@ -13,54 +17,84 @@ export async function fetchQuizMicroQuery(
   res: Response
 ){
   try{
-    const microtopicRequest = req.body as MicrotopicRequest
-    if(!microtopicRequest||!microtopicRequest.arrayMicroTopic){
-      return res.status(400).send('Bad request: Missing required fields');
+    const microTopicRequest = req.body as MicrotopicRequest
+    if(!microTopicRequestCheck(microTopicRequest)){
+      return res.status(400).send('Bad request');
     }
 
     const results : QuizDB[]=[];
-    for (const microTopic of microtopicRequest.arrayMicroTopic){
-      microTopicCheck(microTopic, res)
+    for (const microTopic of microTopicRequest.arrayMicroTopic){
+      if(!microTopicCheck(microTopic)){
+        return res.status(400).send('Invalid input: Check macroTopic ID, microTopic ID, and quantity selected.')
+      }
       if(!microTopic.isChecked){
         continue;
       }
       const quantitySelected = Math.min(microTopic.quantitySelected,QUIZ_LIMIT)
-
-
+      const [rows] = await myPool.query<RowDataPacket[]>(`
+        SELECT *
+        FROM quiz
+        WHERE macroTopicId = ?
+          AND microtopicId = ? 
+        ORDER BY RAND()
+        LIMIT ?;
+      `, [microTopic.macroID, microTopic.microID ,  quantitySelected])
+        const quizzes = rows as QuizDB[];
+        results.push(...quizzes)
     }
     
+
+    const resultsForFE: QuizBase[] = results.map(quiz=>quizDBToQuizFE(quiz))
     
+    
+    console.log('result for frontend: ')
+    console.log(resultsForFE)
+
+    res.json({
+      message: 'ecco qui il risultato ella query micro',
+      quizesArray: resultsForFE
+    })
+
   }catch(err){
     console.error('Error: ', err);
     res.status(500).send('Internal server error');
-
   }
 }
 
+function microTopicRequestCheck(microTopicRequest: MicrotopicRequest):boolean{
+  if(!microTopicRequest||!microTopicRequest.arrayMicroTopic){
+    return false;
+  }
+  if(microTopicRequest.arrayMicroTopic.length>MICROTOPIC_ARRAY_LIMIT){
+    return false;
+  }
+  
+  return true;
+}
 
-
-function microTopicCheck(microTopic:MicroTopicBase,res:Response) {
+function microTopicCheck(microTopic:MicroTopicBase):boolean{
   if(
-    !Number.isInteger(microTopic.microID)||
+    !Number.isInteger(microTopic.macroID)||
     microTopic.macroID<=0||
-    microTopic.macroID>MICROTOPIC_LIMIT
+    microTopic.macroID>MACROTOPIC_LIMIT
   ){
-    return res.status(400).send('Invalid macroTopic ID: The ID must be a positive integer within the allowed range.');
+    return false
   }
 
   if(
     !Number.isInteger(microTopic.microID)||
-    microTopic.macroID<=0||
-    microTopic.macroID>MACROTOPIC_LIMIT
+    microTopic.microID<=0||
+    microTopic.microID>MICROTOPIC_LIMIT
   ){
-    return res.status(400).send('Invalid microTopic ID: The ID must be a positive integer within the allowed range.');
+    return false
   }
 
   if(
     !Number.isInteger(microTopic.quantitySelected)||
     microTopic.quantitySelected<=0
   ){
-    return res.status(400).send('Invalid quantity selected: The quantity must be a positive integer greater than zero.');
+    return false
   }
 
+  return true
 }

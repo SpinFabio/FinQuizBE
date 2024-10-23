@@ -8,6 +8,7 @@ import {loggerMiddleware,loggerErrorMiddleware} from './middlewares/logger-middl
 import envHealthChecker from './utils-functions/env-health-check';
 import {createTestRouter} from './routes/test'
 import {createMacroRouter} from './routes/macro';
+import { cerateMicroRouter } from './routes/micro';
 
 
 
@@ -56,8 +57,8 @@ const myPool= mysql.createPool({
 //------------------------- Routers -----------------------------------------------------
 
 app.use('/api/test', createTestRouter(myPool))
-
 app.use('/api/macro', createMacroRouter(myPool));
+app.use('/api/micro', cerateMicroRouter(myPool))
 
 //---------------------------------------------------------------------------------------
 

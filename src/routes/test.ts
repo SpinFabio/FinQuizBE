@@ -7,13 +7,11 @@ export const createTestRouter= (myPool: Pool)=>{
   router
     .route('/')
     .post((req,res)=>{
-      console.log('sono il router POST /api/test')
       res.json({
         'messaggio': 'ecco qui la risposta alla test post '
       })  
     })
     .get((_,res)=>{
-      console.log('ricevuta una get dal client'); 
       res.json({ response: {
           'messaggio':'Ricevuto il messaggio dal client!',
           'contenuto':'prototipo del contenuto'

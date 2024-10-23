@@ -3,8 +3,9 @@ import { Pool, RowDataPacket } from 'mysql2/promise';
 import { MacroTopicResponse, MacroTopicRequest, MacroTopicBase } from '../../common-interfaces/macro-topic-interfaces';
 import { QuizBase,QuizDB } from "../../common-interfaces/quiz-interface";
 import { quizDBToQuizFE } from '../../utils-functions/quiz-convert'
+import dotenv from 'dotenv';
 
-
+dotenv.config();
 const QUIZ_LIMIT = parseInt( process.env.QUIZ_LIMIT!)
 const MACROTOPIC_LIMIT = parseInt( process.env.MACROTOPIC_LIMIT!)
 const MACROTOPIC_ARRAY_LIMIT = parseInt(process.env.MACROTOPIC_ARRAY_LIMIT!)
@@ -17,17 +18,21 @@ export async function fetchQuizMacroQuery(
 ){
   try {
     const macroTopicRequest = req.body as MacroTopicRequest;
-  
-    macroTopicRequestCheck(macroTopicRequest,res)
+
+    if(!macroTopicRequestCheck(macroTopicRequest)){
+      return res.status(400).send('Bad request: Missing required fields');
+    }
 
     const results: QuizDB[] = [];
     for (const macroTopic of macroTopicRequest.arrayMacrotopic) {
       
-      macroTopicCheck(macroTopic,res)
-      if(!macroTopic.isChecked){
-        break;
+      if(!macroTopicCheck(macroTopic)){
+        return res.status(400).send('Invalid input: Check macroTopic ID and quantity selected.');
       }
-      const quantitySelected= Math.min(macroTopic.quantitySelected,QUIZ_LIMIT)
+      if(!macroTopic.isChecked){
+        continue;
+      }
+      const quantitySelected= Math.min(macroTopic.quantitySelected, QUIZ_LIMIT)
       const [rows] = await myPool.query<RowDataPacket[]>(`
         SELECT *
         FROM quiz
@@ -40,22 +45,16 @@ export async function fetchQuizMacroQuery(
       results.push(...quizzes); 
     }
     
-    //console.log('result 1: ')
-    //console.log(results);
     
     const resultsForFE: QuizBase[] = [];
     for (const quiz of results) {
       resultsForFE.push(quizDBToQuizFE(quiz)); // Usa la funzione di conversione
     }
 
-    //console.log('result for frontend: ')
-    //console.log(resultsForFE)
     console.log('query macro db finita')
     res.json({
-      response: {
-        message: 'Ecco qui il risultato della query',
+        message: 'Ecco qui il risultato della query Macro',
         quizesArray: resultsForFE,  
-      } as MacroTopicResponse,  
     });
 
   } catch (err) {
@@ -64,52 +63,33 @@ export async function fetchQuizMacroQuery(
   }
 }
 
-function macroTopicRequestCheck(macroTopicRequest:MacroTopicRequest, res:Response){
+function macroTopicRequestCheck(macroTopicRequest:MacroTopicRequest):boolean{
   if (!macroTopicRequest || !macroTopicRequest.arrayMacrotopic) {
-    return res.status(400).send('Bad request: Missing required fields');
+    return false
   }
   if(macroTopicRequest.arrayMacrotopic.length>MACROTOPIC_ARRAY_LIMIT){
-    return res.status(400).send('Bad request: Too many macro topic elements');
+    return false
   }
+  return true;
 }
 
-function macroTopicCheck(macroTopic:MacroTopicBase, res: Response){
+function macroTopicCheck(macroTopic:MacroTopicBase):boolean{
   if (
     !Number.isInteger(macroTopic.macroID) || 
     macroTopic.macroID <= 0 || 
     macroTopic.macroID > MACROTOPIC_LIMIT
   ) {
-    return res.status(400).send('Invalid macroTopic ID: The ID must be a positive integer within the allowed range.');
+    return false  
   }
   
   if (
     !Number.isInteger(macroTopic.quantitySelected) || 
     macroTopic.quantitySelected <= 0
   ) {
-    return res.status(400).send('Invalid quantity selected: The quantity must be a positive integer greater than zero.');
+    return false;
   }
-  
+  return true;
 }
 
 
 
-export async function fetchMacroTPQuery(myPool: Pool, res?: Response) {
-  try {
-    const [testResults,_] = await myPool.query<RowDataPacket[]>(`
-      SELECT * 
-      FROM 
-      `);
-    //console.log(testResults); // ricordati di toglierlo quando finisci di debuggare
-
-    if (res !== undefined) {
-      res.json({
-        response: {
-          message: 'Ecco qui il risultato della query',
-          data: testResults,
-        },
-      });
-    }
-  } catch (err) {
-    console.error('Error executing test query:', err);
-  }
-}
