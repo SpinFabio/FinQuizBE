@@ -2,7 +2,7 @@
 import {Pool} from 'mysql2/promise'
 import express from 'express';
 import rateLimit from 'express-rate-limit';
-import { fetchQuizMicroQuery } from '../db/querys/fetch-micro-query';
+import { fetchQuizMicroQuery } from '../db/querys/micro-fetch-query'
 
 
 

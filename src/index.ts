@@ -2,21 +2,25 @@ import express from 'express';
 import path from 'path';
 import mysql from 'mysql2';
 import dotenv from 'dotenv'
+import bcrypt from 'bcrypt';
 import rateLimit from 'express-rate-limit';
 import errorHandler from './middlewares/error-handler-middleware'
 import {loggerMiddleware,loggerErrorMiddleware} from './middlewares/logger-middleware'
 import envHealthChecker from './utils-functions/env-health-check';
-import {createTestRouter} from './routes/test'
-import {createMacroRouter} from './routes/macro';
-import { cerateMicroRouter } from './routes/micro';
+import {createTestRouter} from './routes/test-router'
+import {createMacroRouter} from './routes/macro-router';
+import { cerateMicroRouter } from './routes/micro-router';
+import { UserDB, InsertUserRequest } from './common-interfaces/user-interfaces';
+import { cerateUserRouter } from './routes/user-router';
+import { databaseHealtCheck } from './utils-functions/DB-health-check';
 
 
 
 dotenv.config()
+envHealthChecker()
 
 const app=express()
 const PORT=3000
-envHealthChecker()
 
 //---------------------- dichiarazione dei MIDDLEWARE -----------------------------------
 
@@ -43,7 +47,7 @@ if(!array.reduce((p,c)=> p && Object.keys(process.env).includes(c), true)){
 //------------------------- DATABASE ----------------------------------------------------
 
 const myPool= mysql.createPool({
-  host: process.env.DB_HOST,           // Assicurati di avere queste variabili nell'.env
+  host: process.env.DB_HOST,           
   user: process.env.DB_USER,           
   password: process.env.DB_PASSWORD,   
   database: process.env.DB_DATABASENAME,
@@ -51,17 +55,46 @@ const myPool= mysql.createPool({
   connectionLimit:10,
 }).promise()
 
+
+databaseHealtCheck(myPool).catch((err)=>{
+  console.error(err.message);
+  process.exit(1);
+})
+
 //---------------------------------------------------------------------------------------
 
 
-//------------------------- Routers -----------------------------------------------------
+//------------------------- Routers ---- -------------------------------------------------
 
 app.use('/api/test', createTestRouter(myPool))
-app.use('/api/macro', createMacroRouter(myPool));
+app.use('/api/macro', createMacroRouter(myPool))
 app.use('/api/micro', cerateMicroRouter(myPool))
+app.use('/api/user', cerateUserRouter(myPool))
 
 //---------------------------------------------------------------------------------------
 
+
+//---------------------------- testing ---------------------------------------------------
+
+const users: UserDB[] = [];
+
+users.push({
+  name: 'ciaone',
+  email: 'ciaone@example.com',
+  pwhash: 'hashedPassword1',
+  salt: 'randomSalt1',
+  created_at: new Date().toISOString(),
+  updated_at: new Date().toISOString(),
+  role: 'user'
+});
+
+
+
+//---------------------------------------------------------------------------------------
+
+app.all('*', (req, res) => {
+  res.status(404).send('Route not found');
+});
 app.listen(PORT, () => {
   console.log(`Server avviato su http://localhost:${PORT}`);
 });

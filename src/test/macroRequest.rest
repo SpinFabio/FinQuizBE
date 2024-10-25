@@ -1,0 +1,12 @@
+POST http://localhost:3000/api/macro
+Content-Type: application/json
+
+{
+  "arrayMacrotopic": [
+    { "quantitySelected": 3, "macroID": 1, "isChecked": true },
+    { "quantitySelected": 5, "macroID": 2, "isChecked": false },
+    { "quantitySelected": 6, "macroID": 3, "isChecked": true },
+    { "quantitySelected": 4, "macroID": 4, "isChecked": false },
+    { "quantitySelected": 2, "macroID": 5, "isChecked": true }
+  ]
+}

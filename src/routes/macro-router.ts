@@ -1,11 +1,11 @@
 import  express  from "express";
-import {fetchQuizMacroQuery} from '../db/querys/fetch-macro-query'
+import {fetchQuizMacroQuery} from '../db/querys/macro-fetch-query'
 import {Pool} from 'mysql2/promise'
 import rateLimit from 'express-rate-limit';
 
 
 
-export const createMacroRouter= (myPool:Pool)=>{
+export const createMacroRouter = (myPool:Pool)=>{
   const router=express.Router();
 
   //----------------------- Middleware -------------------------------------------------------------
@@ -24,7 +24,6 @@ export const createMacroRouter= (myPool:Pool)=>{
 
 
   router.post('/',(req,res)=>{
-    //console.log('sono il router POST /api/macro')
     fetchQuizMacroQuery(myPool,req,res)
   })
   

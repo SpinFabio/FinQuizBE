@@ -1,7 +1,7 @@
 import { Request, Response } from 'express';
 import { Pool, RowDataPacket } from 'mysql2/promise';
 import { MacroTopicResponse, MacroTopicRequest, MacroTopicBase } from '../../common-interfaces/macro-topic-interfaces';
-import { QuizBase,QuizDB } from "../../common-interfaces/quiz-interface";
+import { QuizBase,QuizDB } from "../../common-interfaces/quiz-interfaces";
 import { quizDBToQuizFE } from '../../utils-functions/quiz-convert'
 import dotenv from 'dotenv';
 

@@ -1,14 +1,7 @@
-// base non nel senso di database, ma nel senso che il FE ci aggiunge 2 campi
+import { RowDataPacket } from "mysql2";
 
-export interface QuizBase {
-  macroTopicID: number;
-  microTopicID: number;
-  question: string;
-  correctAnswer: string;
-  allAnswers: string[];
-  level: number;
-  subcontent: string;
-}
+
+export interface QuizRow extends QuizDB, RowDataPacket {}
 
 export interface QuizDB {
   id: number;                     
@@ -22,3 +15,14 @@ export interface QuizDB {
   score: number;                   
   subcontent: string;              
 }
+
+export interface QuizBase {
+  macroTopicID: number;
+  microTopicID: number;
+  question: string;
+  correctAnswer: string;
+  allAnswers: string[];
+  level: number;
+  subcontent: string;
+}
+
