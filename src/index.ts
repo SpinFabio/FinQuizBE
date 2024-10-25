@@ -12,7 +12,7 @@ import {createMacroRouter} from './routes/macro-router';
 import { cerateMicroRouter } from './routes/micro-router';
 import { UserDB, InsertUserRequest } from './common-interfaces/user-interfaces';
 import { cerateUserRouter } from './routes/user-router';
-import { databaseHealtCheck } from './utils-functions/DB-health-check';
+import { databaseHealtCheck } from './utils-functions/database-health-check';
 
 
 
