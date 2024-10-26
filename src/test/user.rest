@@ -9,7 +9,7 @@ Content-Type: application/json
 
 {
   "name": "sono un test user",
-  "email": "allorsa@example.com",
+  "email": "spin.fabio20@gmail.com",
   "password": "miapasswordona"
 }
 
@@ -18,3 +18,9 @@ Content-Type: application/json
 ###
 POST http://localhost:3000/api/user/login
 Content-Type: application/json
+
+{
+  "name": "sono un test user",
+  "email": "allorsa@example.com",
+  "password": "miapasswordona"
+}

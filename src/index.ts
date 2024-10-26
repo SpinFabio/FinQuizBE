@@ -10,7 +10,7 @@ import envHealthChecker from './utils-functions/env-health-check';
 import {createTestRouter} from './routes/test-router'
 import {createMacroRouter} from './routes/macro-router';
 import { cerateMicroRouter } from './routes/micro-router';
-import { UserDB, InsertUserRequest } from './common-interfaces/user-interfaces';
+import { UserDB, UserRequest } from './common-interfaces/user-interfaces';
 import { cerateUserRouter } from './routes/user-router';
 import { databaseHealtCheck } from './utils-functions/database-health-check';
 
@@ -74,23 +74,6 @@ app.use('/api/user', cerateUserRouter(myPool))
 //---------------------------------------------------------------------------------------
 
 
-//---------------------------- testing ---------------------------------------------------
-
-const users: UserDB[] = [];
-
-users.push({
-  name: 'ciaone',
-  email: 'ciaone@example.com',
-  pwhash: 'hashedPassword1',
-  salt: 'randomSalt1',
-  created_at: new Date().toISOString(),
-  updated_at: new Date().toISOString(),
-  role: 'user'
-});
-
-
-
-//---------------------------------------------------------------------------------------
 
 app.all('*', (req, res) => {
   res.status(404).send('Route not found');
