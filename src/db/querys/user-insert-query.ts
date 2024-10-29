@@ -27,7 +27,7 @@ export async function insertNewUser(
     `,[newUser.name,newUser.email,hashedPassword])
 
     if(result.affectedRows>0){
-      res.status(201).send("user Sucessfully registered")
+      res.status(201).send("User Sucessfully registered")
     }else{
       res.status(500).send('Failed to register user');
     }

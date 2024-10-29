@@ -4,19 +4,18 @@ const envNameArray = [
   'DB_PASSWORD',
   'DB_DATABASENAME',
   'QUIZ_LIMIT',
-  'MACROTOPIC_LIMIT',
   'MACROTOPIC_ARRAY_LIMIT',
-  'MICROTOPIC_LIMIT',
   'MICROTOPIC_ARRAY_LIMIT',
+  'AUTH_PORT',
+  'ACCESS_TOKEN_SECRET',
+  'REFRESH_TOKEN_SECRET'
 ];
 
 
 
 
 export default  function envHealthChecker(){
-  
   const somethingIsNull=envNameArray.reduce((prev,current)=>{
-    //console.log(`current${current} prev ${prev}, process.env ${!!process.env[current]}`)
     return prev && !!process.env[current]
   },true)
 

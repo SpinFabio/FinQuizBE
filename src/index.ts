@@ -2,7 +2,6 @@ import express from 'express';
 import path from 'path';
 import mysql from 'mysql2';
 import dotenv from 'dotenv'
-import bcrypt from 'bcrypt';
 import rateLimit from 'express-rate-limit';
 import errorHandler from './middlewares/error-handler-middleware'
 import {loggerMiddleware,loggerErrorMiddleware} from './middlewares/logger-middleware'
@@ -10,17 +9,15 @@ import envHealthChecker from './utils-functions/env-health-check';
 import {createTestRouter} from './routes/test-router'
 import {createMacroRouter} from './routes/macro-router';
 import { cerateMicroRouter } from './routes/micro-router';
-import { UserDB, UserRequest } from './common-interfaces/user-interfaces';
 import { cerateUserRouter } from './routes/user-router';
 import { databaseHealtCheck } from './utils-functions/database-health-check';
 
 
-
 dotenv.config()
-envHealthChecker()
-
 const app=express()
-const PORT=3000
+
+envHealthChecker()
+const PORT=process.env.PORT
 
 //---------------------- dichiarazione dei MIDDLEWARE -----------------------------------
 

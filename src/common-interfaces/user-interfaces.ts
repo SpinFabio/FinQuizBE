@@ -8,9 +8,15 @@ export interface UserDB {
   name: string;
   email: string;
   pwhash: string;
-  salt: string;
   created_at?: string; 
   updated_at?: string; 
+  role: string;
+}
+
+export interface UserFE{
+  id?: number;
+  name: string;
+  email: string;
   role: string;
 }
 
@@ -25,3 +31,15 @@ export const insertUserSchema = Yup.object({
   email: Yup.string().email().required(),
   password: Yup.string().min(8).required()
 })
+
+
+export function fromUserDBtoUserFE(userDB:UserDB):UserFE{
+  const userFE:UserFE={
+    id:userDB.id,
+    name:userDB.name,
+    email:userDB.email,
+    role: userDB.role
+  }
+  
+  return userFE
+}

@@ -1,13 +1,13 @@
 import { Request, Response } from 'express';
 import { Pool,ResultSetHeader } from 'mysql2/promise';
-import { UserRequest, UserRow, insertUserSchema } from '../../common-interfaces/user-interfaces';
+import { UserDB, UserRequest, UserRow, insertUserSchema } from '../../common-interfaces/user-interfaces';
 import bcrypt from 'bcrypt';
 import * as Yup from 'yup';
 
 export async function loginUser(
   myPool: Pool, 
   req: Request, 
-  res: Response) {
+  res: Response):Promise<UserDB | null> {
     
     try{
       const user = req.body as UserRequest
@@ -20,24 +20,29 @@ export async function loginUser(
       `,[user.email])
 
       if(rows.length === 0){
-        return res.status(400).send('User not registered');
+        res.status(400).send('User not registered');
+        return null
       }
 
       const isPasswordValid = await bcrypt.compare(user.password, rows[0].pwhash);
       if (isPasswordValid) {
-        return res.status(200).send('Success');
+        //res.status(200).send('Success');
+        return rows[0] as UserDB
       } else {
-        return res.status(401).send('Invalid credentials');
+        res.status(401).send('Invalid credentials');
+        return null 
       }
       
-
+      
     } catch (err) {
       if (err instanceof Yup.ValidationError) {
-        return res.status(400).json({ errors: err.errors });
+        res.status(400).json({ errors: err.errors });
+        return null
       }
     console.error('Error: ', err);
     res.status(500).send('Internal server error');
   }
+  return null
 }
 
 

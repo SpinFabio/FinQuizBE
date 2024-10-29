@@ -1,14 +1,13 @@
 import { Request, Response } from 'express';
 import { Pool, RowDataPacket } from 'mysql2/promise';
-import { MicrotopicRequest,MicroTopicBase, MicroTopicResponse } from '../../common-interfaces/micro-topic-interfaces';
+import { MicrotopicRequest,MicroTopicBase, MicroTopicResponse, microTopicBaseSchema } from '../../common-interfaces/micro-topic-interfaces';
 import { QuizBase, QuizDB } from '../../common-interfaces/quiz-interfaces';
 import { quizDBToQuizFE } from '../../utils-functions/quiz-convert';
+import * as Yup from 'yup';
 import dotenv from 'dotenv';
 
 dotenv.config();
 const QUIZ_LIMIT = parseInt(process.env.QUIZ_LIMIT!)
-const MACROTOPIC_LIMIT = parseInt(process.env.MACROTOPIC_LIMIT!)
-const MICROTOPIC_LIMIT= parseInt(process.env.MICROTOPIC_LIMIT!)
 const MICROTOPIC_ARRAY_LIMIT = parseInt(process.env.MICROTOPIC_ARRAY_LIMIT!)
 
 export async function fetchQuizMicroQuery( 
@@ -24,9 +23,7 @@ export async function fetchQuizMicroQuery(
 
     const results : QuizDB[]=[];
     for (const microTopic of microTopicRequest.arrayMicroTopic){
-      if(!microTopicCheck(microTopic)){
-        return res.status(400).send('Invalid input: Check macroTopic ID, microTopic ID, and quantity selected.')
-      }
+      await microTopicBaseSchema.validate(microTopic,{ abortEarly: false})
       if(!microTopic.isChecked){
         continue;
       }
@@ -46,9 +43,6 @@ export async function fetchQuizMicroQuery(
 
     const resultsForFE: QuizBase[] = results.map(quiz=>quizDBToQuizFE(quiz))
     
-    
-    //console.log('result for frontend: ')
-    //console.log(resultsForFE)
 
     res.json({
       message: 'ecco qui il risultato ella query micro',
@@ -56,6 +50,9 @@ export async function fetchQuizMicroQuery(
     })
 
   }catch(err){
+    if (err instanceof Yup.ValidationError) {
+      return res.status(400).json({ errors: err.errors });
+    }
     console.error('Error: ', err);
     res.status(500).send('Internal server error');
   }
@@ -70,43 +67,4 @@ function microTopicRequestCheck(microTopicRequest: MicrotopicRequest):boolean{
   }
   
   return true;
-}
-
-function microTopicCheck(microTopic:MicroTopicBase):boolean{
-  const macroID = microTopic.macroID
-  const microID= microTopic.microID
-  const remainer= microID%(macroID*100)
-
-  if(
-    !Number.isInteger(microTopic.macroID)||
-    macroID<=0||
-    macroID>MACROTOPIC_LIMIT
-  ){
-    return false
-  }
-
-  if(
-    !Number.isInteger(microTopic.microID)||
-    microID<=0||
-    microID>MICROTOPIC_LIMIT
-  ){
-    return false
-  }
-
-  if(
-    !Number.isInteger(microTopic.quantitySelected)||
-    microTopic.quantitySelected<=0
-  ){
-    return false
-  }
-  
-
-  if(
-    remainer==0 ||
-    remainer>100
-  ){
-    return false
-  }
-
-  return true
 }

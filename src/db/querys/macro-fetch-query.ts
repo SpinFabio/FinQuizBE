@@ -1,13 +1,13 @@
 import { Request, Response } from 'express';
 import { Pool, RowDataPacket } from 'mysql2/promise';
-import { MacroTopicResponse, MacroTopicRequest, MacroTopicBase } from '../../common-interfaces/macro-topic-interfaces';
+import { MacroTopicRequest, macroTopicBaseSchema } from '../../common-interfaces/macro-topic-interfaces';
 import { QuizBase,QuizDB } from "../../common-interfaces/quiz-interfaces";
 import { quizDBToQuizFE } from '../../utils-functions/quiz-convert'
 import dotenv from 'dotenv';
+import * as Yup from 'yup';
 
 dotenv.config();
 const QUIZ_LIMIT = parseInt( process.env.QUIZ_LIMIT!)
-const MACROTOPIC_LIMIT = parseInt( process.env.MACROTOPIC_LIMIT!)
 const MACROTOPIC_ARRAY_LIMIT = parseInt(process.env.MACROTOPIC_ARRAY_LIMIT!)
 
 
@@ -26,9 +26,7 @@ export async function fetchQuizMacroQuery(
     const results: QuizDB[] = [];
     for (const macroTopic of macroTopicRequest.arrayMacrotopic) {
       
-      if(!macroTopicCheck(macroTopic)){
-        return res.status(400).send('Invalid input: Check macroTopic ID and quantity selected.');
-      }
+      await macroTopicBaseSchema.validate(macroTopic)
       if(!macroTopic.isChecked){
         continue;
       }
@@ -58,6 +56,9 @@ export async function fetchQuizMacroQuery(
     });
 
   } catch (err) {
+    if (err instanceof Yup.ValidationError) {
+      return res.status(400).json({ errors: err.errors });
+    }
     console.error('Error: ', err);
     res.status(500).send('Internal server error');
   }
@@ -73,23 +74,6 @@ function macroTopicRequestCheck(macroTopicRequest:MacroTopicRequest):boolean{
   return true;
 }
 
-function macroTopicCheck(macroTopic:MacroTopicBase):boolean{
-  if (
-    !Number.isInteger(macroTopic.macroID) || 
-    macroTopic.macroID <= 0 || 
-    macroTopic.macroID > MACROTOPIC_LIMIT
-  ) {
-    return false  
-  }
-  
-  if (
-    !Number.isInteger(macroTopic.quantitySelected) || 
-    macroTopic.quantitySelected <= 0
-  ) {
-    return false;
-  }
-  return true;
-}
 
 
 

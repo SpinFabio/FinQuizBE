@@ -2,10 +2,9 @@ GET http://localhost:3000/api/user/
 Content-Type: application/json
 
 
-###
+###----------------------------------------------------------------------------------
 POST http://localhost:3000/api/user
 Content-Type: application/json
-
 
 {
   "name": "sono un test user",
@@ -15,12 +14,23 @@ Content-Type: application/json
 
 
 
-###
+###----------------------------------------------------------------------------------
+
 POST http://localhost:3000/api/user/login
 Content-Type: application/json
 
 {
   "name": "sono un test user",
-  "email": "allorsa@example.com",
+  "email": "spin.fabio20@gmail.com",
   "password": "miapasswordona"
 }
+
+###----------------------------------------------------------------------------------
+
+POST http://localhost:3000/api/user/verify
+Authorization: Bearer eyJhbGciOiJIUsasazI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MTEsIm5hbWUiOiJzb25vIHVuIHRlc3QgdXNlciIsImVtYWlsIjoic3Bpbi5mYWJpbzIwQGdtYWlsLmNvbSIsInJvbGUiOiJ1c2VyIiwiaWF0IjoxNzMwMjE2NjUyfQ.ZItNXI6NwuF-gz-Ay9OUehJWrFK9QNWUcDQRNmMTtsc
+
+{
+  "message": "ciao sono dinuovo l' utente",
+}
+
