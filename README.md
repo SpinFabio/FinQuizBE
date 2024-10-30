@@ -1,4 +1,4 @@
-# MySQL
+# il mio database MySQL
 * Username: root
 * Password: ParolaDiPassaggio-01
 * default port number: 3306

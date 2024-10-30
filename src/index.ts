@@ -1,6 +1,6 @@
 import express from 'express';
 import path from 'path';
-import mysql from 'mysql2';
+import mysql from 'mysql2'
 import dotenv from 'dotenv'
 import rateLimit from 'express-rate-limit';
 import errorHandler from './middlewares/error-handler-middleware'
@@ -14,9 +14,8 @@ import { databaseHealtCheck } from './utils-functions/database-health-check';
 
 
 dotenv.config()
-const app=express()
-
 envHealthChecker()
+const app=express()
 const PORT=process.env.PORT
 
 //---------------------- dichiarazione dei MIDDLEWARE -----------------------------------
