@@ -5,14 +5,29 @@
     "outDir": "./dist",
     "lib": ["es5", "es6", "dom"],
     "rootDir": ".",
+    "typeRoots": ["./node_modules/@types", "./types"],
     "declaration": true,
     "moduleResolution": "node",
-    "strictPropertyInitialization": false,
+    "strictPropertyInitialization": true,
     "sourceMap": true,
     "strict": true,
     "esModuleInterop": true,
     "resolveJsonModule": true,
-    "skipLibCheck": true
+    "skipLibCheck": true,
+    "noImplicitAny": true,/* 
+    "noImplicitReturns": true, */
+    "noImplicitThis": true,
+    "alwaysStrict": true,
+    "strictBindCallApply": true,
+    "strictFunctionTypes": true,
+    "strictNullChecks": true,
+    "noFallthroughCasesInSwitch": true,
+    "forceConsistentCasingInFileNames": true
+
+
+    
+    
+
   },
   "include": [
     "src/**/*",

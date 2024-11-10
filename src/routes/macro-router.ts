@@ -1,5 +1,5 @@
 import  express  from "express";
-import {fetchQuizMacroQuery} from '../db/querys/macro-fetch-query'
+import {fetchQuizMacroQuery} from '../db/querys/macro-fetch'
 import {Pool} from 'mysql2/promise'
 import rateLimit from 'express-rate-limit';
 

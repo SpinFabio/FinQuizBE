@@ -1,10 +1,11 @@
-import { Request } from 'express';
-import { UserDB } from './src/common-interfaces/user-interfaces';
+import { UserFE } from "./src/common/user-interfaces";
+import { AuthCookies } from "./src/common/auth-interface";
 
 declare global {
   namespace Express {
     interface Request {
-      user?: UserDB;  
+      user?: UserFE;
+      cookies?: AuthCookies;
     }
   }
 }
