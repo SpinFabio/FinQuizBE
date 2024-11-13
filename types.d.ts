@@ -1,5 +1,4 @@
-import { UserFE } from "./src/common/user-interfaces";
-import { AuthCookies } from "./src/common/auth-interface";
+import { UserFE,AuthCookies } from "./src/common/user-interfaces";
 
 declare global {
   namespace Express {

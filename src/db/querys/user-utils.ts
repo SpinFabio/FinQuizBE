@@ -1,11 +1,13 @@
 import { Pool, ResultSetHeader } from "mysql2/promise";
-import { UserRow } from "../../common/user-interfaces";
-import { SessionRow, UserSessionDB } from "../../common/auth-interface";
+import {
+  SessionRow,
+  UserRow,
+  UserSessionDB
+} from "../../common/user-interfaces";
 import { Request, Response } from "express";
 import dotenv from "dotenv";
 
 dotenv.config();
-
 
 export async function getUserByEmail(
   email: string,
@@ -64,16 +66,17 @@ export async function setSessionEntry(
   return rows;
 }
 
-
 export function setResponseCookies(
   res: Response,
-  uuid:string,
-  refreshToken:string,
-  
-){
+  uuid: string,
+  refreshToken: string
+) {
   res.cookie("refreshToken", refreshToken, {
     httpOnly: true,
     maxAge: Number(process.env.COOKIE_MAX_AGE_MS!)
   });
-
+  res.cookie("uuid", uuid, {
+    httpOnly:true,
+    maxAge: Number(process.env.COOKIE_MAX_AGE_MS!)
+  });
 }

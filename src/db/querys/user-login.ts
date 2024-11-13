@@ -1,12 +1,15 @@
 import { Request, Response } from "express";
 import { Pool, ResultSetHeader } from "mysql2/promise";
 import {
+  AuthBodyReqRes,
+  SessionRow,
   UserDB,
   UserFE,
   UserRequest,
   UserRow,
+  UserSessionDB,
   fromUserDBtoUserFE,
-  insertUserSchema
+  userLoginRequestSchema
 } from "../../common/user-interfaces";
 import bcrypt from "bcrypt";
 import * as Yup from "yup";
@@ -17,7 +20,7 @@ import {
   setSessionEntry
 } from "./user-utils";
 import generateTokens from "../../utils/auth-token-utils";
-import { SessionRow, UserSessionDB } from "../../common/auth-interface";
+
 import dotenv from "dotenv";
 
 dotenv.config();
@@ -29,8 +32,9 @@ export async function loginUser(
 ): Promise<void> {
   try {
     const user = req.body as UserRequest;
+    console.log(user);
 
-    await insertUserSchema.validate(user, { abortEarly: false });
+    await userLoginRequestSchema.validate(user, { abortEarly: false });
 
     const rows: UserRow[] = await getUserByEmail(user.email, myPool);
 
@@ -74,14 +78,13 @@ export async function loginUser(
       return;
     }
 
-    setResponseCookies(res,user.uuid,tokens.refreshToken)
+    setResponseCookies(res, user.uuid, tokens.refreshToken);
 
-    res.status(200).json({
+    const responseBody: AuthBodyReqRes = {
       message: "Login Successful!",
       accessToken: tokens.accessToken
-    });
-
-
+    };
+    res.status(200).json(responseBody);
   } catch (err) {
     if (err instanceof Yup.ValidationError) {
       res.status(400).json({ errors: err.errors });

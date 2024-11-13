@@ -3,8 +3,8 @@ import dotenv from "dotenv";
 import { Pool } from "mysql2/promise";
 import insertNewUser from "../db/querys/user-register";
 import { loginUser } from "../db/querys/user-login";
-import { verifyAccessToken, verifyRefreshToken } from "../middlewares/authenticateToken-middleware";
 import { handleSessionRefresh } from "../db/querys/user-session";
+import { verifyAccessToken, verifyAndRefreshTokens, verifyRefreshToken } from "../middlewares/authenticateToken-middleware";
 
 dotenv.config();
 
@@ -25,14 +25,20 @@ export const cerateUserRouter = (myPool: Pool) => {
     .post("/login", async (req, res) => {
       await loginUser(myPool, req, res);
     })
-    .get("/refresh",verifyRefreshToken,async (req,res)=>{
-      await handleSessionRefresh(req,res,myPool)
+    .get("/refresh", verifyRefreshToken, async (req, res) => {
+      await handleSessionRefresh(req, res, myPool);
     })
     .post("/verify", verifyAccessToken, (req, res) => {
       res.status(200).json({
         message: `l'utente ${req.user?.email} può utilizare il servizio`
       });
-    });
+    })
+    .post("/autoTokens",verifyAndRefreshTokens(myPool),(_, res)=>{
+      res.status(200).json({
+        message: `ciao sono auto tokens e tutto è andato bene`
+      });
+    })
+    ;
 
   return router;
 };
