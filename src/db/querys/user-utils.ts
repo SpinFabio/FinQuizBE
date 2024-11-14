@@ -1,4 +1,4 @@
-import { Pool, ResultSetHeader } from "mysql2/promise";
+import { Pool, ResultSetHeader, RowDataPacket } from "mysql2/promise";
 import {
   SessionRow,
   UserRow,
@@ -53,16 +53,16 @@ export async function setSessionEntry(
   if (!user_id || !uuid || !refreshToken) {
     throw new Error("user_id, UUID and  refresh token are required");
   }
-
   const [rows] = await myPool.query<ResultSetHeader>(
-    `
-    INSERT INTO user_sessions (user_id, uuid, refresh_token)
+    `INSERT INTO user_sessions (user_id, uuid, refresh_token)
     VALUES (?, ?, ?)
     ON DUPLICATE KEY UPDATE 
-      refresh_token = VALUES(refresh_token)
-    `,
+      user_id= VALUES(user_id),
+      refresh_token = VALUES(refresh_token)`,
     [user_id, uuid, refreshToken]
   );
+  
+
   return rows;
 }
 
@@ -76,7 +76,7 @@ export function setResponseCookies(
     maxAge: Number(process.env.COOKIE_MAX_AGE_MS!)
   });
   res.cookie("uuid", uuid, {
-    httpOnly:true,
+    httpOnly: true,
     maxAge: Number(process.env.COOKIE_MAX_AGE_MS!)
   });
 }

@@ -1,5 +1,5 @@
 import { Request, Response } from "express";
-import { Pool, ResultSetHeader } from "mysql2/promise";
+import { Pool, ResultSetHeader, RowDataPacket } from "mysql2/promise";
 import {
   AuthBodyReqRes,
   SessionRow,
@@ -19,7 +19,7 @@ import {
   setResponseCookies,
   setSessionEntry
 } from "./user-utils";
-import generateTokens from "../../utils/auth-token-utils";
+import generateTokens from "../../utils/token-utils";
 
 import dotenv from "dotenv";
 
@@ -31,34 +31,26 @@ export async function loginUser(
   res: Response
 ): Promise<void> {
   try {
-    const user = req.body as UserRequest;
-    console.log(user);
+    const userRequest = req.body as UserRequest;
 
-    await userLoginRequestSchema.validate(user, { abortEarly: false });
+    await userLoginRequestSchema.validate(userRequest, { abortEarly: false });
 
-    const rows: UserRow[] = await getUserByEmail(user.email, myPool);
-
-    if (!rows || rows.length === 0) {
+    const userRows: UserRow[] = await getUserByEmail(userRequest.email, myPool);
+    if (!userRows || userRows.length === 0) {
       res.status(400).send("User not registered");
       return;
     }
 
-    const userDB: UserDB = rows[0] as UserDB;
-    const isPasswordValid = await bcrypt.compare(user.password, userDB.pwhash);
+    const userDB: UserDB = userRows[0] as UserDB;
+    await checkPassword(userDB, res, userRequest);
 
-    if (!isPasswordValid) {
-      res.status(401).send("Invalid credentials");
-      return;
-    }
-    if (userDB.id == null) throw new Error("User ID is Undefined");
-    if (user.uuid == null) {
-      res.status(400).send("invalid uuid");
-      return;
-    }
+    const userFE: UserFE = fromUserDBtoUserFE(userDB);
 
+    const tokens = generateTokens(userFE);
     const userSession: UserSessionDB = {
       user_id: userDB.id,
-      uuid: user.uuid
+      uuid: userRequest.uuid,
+      refreshToken: tokens.refreshToken
     };
 
     const isSessionOk = await checkDeviceAuth(userSession, myPool);
@@ -67,18 +59,12 @@ export async function loginUser(
       return;
     }
 
-    const loggedUserFE: UserFE = fromUserDBtoUserFE(userDB);
-    const tokens = generateTokens(loggedUserFE);
-    userSession.refreshToken = tokens.refreshToken;
-
     const result: ResultSetHeader = await setSessionEntry(userSession, myPool);
-
-    if (result.affectedRows === 0) {
-      res.status(500).send("Database operation failed: no rows were affected");
-      return;
+    if(result.affectedRows===0){
+      res.status(500).json({ message: "Failed to set session entry." });
+      throw new Error("Failed to set session entry.")
     }
-
-    setResponseCookies(res, user.uuid, tokens.refreshToken);
+    setResponseCookies(res, userRequest.uuid, tokens.refreshToken);
 
     const responseBody: AuthBodyReqRes = {
       message: "Login Successful!",
@@ -90,7 +76,6 @@ export async function loginUser(
       res.status(400).json({ errors: err.errors });
       return;
     }
-    console.error("Error: ", err);
     res.status(500).send("Internal server error");
   }
 }
@@ -104,7 +89,7 @@ async function checkDeviceAuth(
     myPool
   );
 
-  if (!sessionArray || sessionArray.length == 0) {
+  if (!sessionArray || sessionArray.length === 0) {
     return true;
   }
 
@@ -119,4 +104,23 @@ async function checkDeviceAuth(
   }
 
   return true;
+}
+
+async function checkPassword(
+  userDB: UserDB,
+  res: Response,
+  userRequest: UserRequest
+) {
+  const isPasswordValid = await bcrypt.compare(
+    userRequest.password,
+    userDB.pwhash
+  );
+  if (!isPasswordValid) {
+    res.status(401).send("Invalid password");
+    throw new Error("Invalid password");
+  }
+  if (userRequest.uuid == null) {
+    res.status(400).send("invalid uuid");
+    throw new Error("uuid is invalid");
+  }
 }

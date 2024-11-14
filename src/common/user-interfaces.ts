@@ -22,13 +22,6 @@ export interface UserFE {
   role: string;
 }
 
-export const insertUserSchema = Yup.object({
-  // per inserire un nuovo utente nel DB
-  name: Yup.string().min(3).max(100),
-  email: Yup.string().email().required(),
-  password: Yup.string().min(8).required()
-});
-
 export function fromUserDBtoUserFE(userDB: UserDB): UserFE {
   const userFE: UserFE = {
     id: userDB.id,
@@ -53,7 +46,7 @@ export interface UserSessionDB {
   // sessioni di ogni utente per i vari dispositivi associati
   user_id: number;
   uuid: string;
-  refreshToken?: string;
+  refreshToken: string;
 }
 
 export interface UserRequest {
@@ -71,6 +64,18 @@ export const userLoginRequestSchema = Yup.object({
     .required("La password è obbligatoria"),
   uuid: Yup.string().required("L'UUID è obbligatorio"),
   name: Yup.string().optional()
+});
+
+export const userRegisterRequestSchema = Yup.object({
+  email: Yup.string().email().required("L'email è obbligatoria"),
+  password: Yup.string()
+    .min(8, "La password deve essere almeno di 8 caratteri")
+    .required("La password è obbligatoria"),
+  uuid: Yup.string().required("L'UUID è obbligatorio"),
+  name: Yup.string()
+    .min(3, "Il nome è troppo corto")
+    .max(16, "Il nome è troppo lungo")
+    .required("Il nome è obbligatorio"),
 });
 
 export interface AuthBodyReqRes {

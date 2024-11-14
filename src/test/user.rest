@@ -7,9 +7,10 @@ POST http://localhost:5000/api/user/register
 Content-Type: application/json
 
 {
-  "name": "sono un test user",
-  "email": "spin.fa2bio2012@gmail.com",
-  "password": "miapasswordona"
+  "name": "Fabio",
+  "email": "spinolli.fabio3k@gmail.com",
+  "password": "password",
+  "uuid":"3a3239c5-0121-4515-9ea3-08248b70aabd"
 }
 
 
@@ -20,40 +21,29 @@ POST http://localhost:5000/api/user/login
 Content-Type: application/json
 
 {
-  "name": "sono un test user",
-  "email": "spin.fabio20@gmail.com",
-  "password": "miapasswordona",
-  "uuid":"3a3239c5-0121-4515-9ea3-08248b70aabd"
+  "email": "spinolli.fabio3k@gmail.com",
+  "password": "password",
+  "uuid":"3a3239c5-0121-4515-9ea3-0824sd8b70aabd"
 }
 
 ###----------------------------------------------------------------------------------
 
 POST http://localhost:5000/api/user/verify
 Content-Type: application/json
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MTEsIm5hbWUiOiJzb25vIHVuIHRlc3QgdXNlciIsImVtYWlsIjoic3Bpbi5mYWJpbzIwQGdtYWlsLmNvbSIsInJvbGUiOiJ1c2VyIiwiaWF0IjoxNzMxNTA1NjY2LCJleHAiOjE3MzIxMTA0NjZ9.45ToFHvVBn1fbM0C-F2PKHDckKHcMkW52Z8FNnmn9nc
 Cookie: uuid=3a3239c5-0121-4515-9ea3-08248b70aabd
 
 {
   "message": "ciaone",
-  "accessToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MTEsIm5hbWUiOiJzb25vIHVuIHRlc3QgdXNlciIsImVtYWlsIjoic3Bpbi5mYWJpbzIwQGdtYWlsLmNvbSIsInJvbGUiOiJ1c2VyIiwiaWF0IjoxNzMxNTE2NTc1LCJleHAiOjE3MzE1MTY4NzV9.3-MxFC1qL7q2hYDWVKMyoC2wRADeJKeDvcQLkzfx0-Q"
+  "accessToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MTcsIm5hbWUiOiJGYWJpbyIsImVtYWlsIjoic3Bpbm9sbGkuZmFiaW8za0BnbWFpbC5jb20iLCJyb2xlIjoidXNlciIsImlhdCI6MTczMTU5ODQ5NSwiZXhwIjoxNzMxNTk4Nzk1fQ.1ioM3FExtNHUmJoU69D5KDXO01-s0Qqib367CaQgc40"
 }
 
 
 ###----------------------------------------------------------------------------------
 
 GET http://localhost:5000/api/user/refresh
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MTEsIm5hbWUiOiJzb25vIHVuIHRlc3QgdXNlciIsInJvbGUiOiJ1c2VyIiwiZW1haWwiOiJzcGluLmZhYmlvMjBAZ21haWwuY29tIiwiaWF0IjoxNzMxMjQ2MTc1LCJleHAiOjE3MzE4NTA5NzV9.-FzRaaCnjDrWWyieX9mkNYhzDw-nl2DmQMJbxJu7DKA
-Cookie: uuid=3a3239c5-0121-4515-9ea3-08248b70aabd
-
-
-###-------------------------------------------------------------------------------------
-
-POST http://localhost:5000/api/user/autoTokens
 Content-Type: application/json
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MTEsIm5hbWUiOiJzb25vIHVuIHRlc3QgdXNlciIsImVtYWlsIjoic3Bpbi5mYWJpbzIwQGdtYWlsLmNvbSIsInJvbGUiOiJ1c2VyIiwiaWF0IjoxNzMxNTE2ODYzLCJleHAiOjE3MzIxMjE2NjN9.iCtibEVSVcEThFQeHLXdQ1hoLFJQ5zW57PRXev-k7L8
 Cookie: uuid=3a3239c5-0121-4515-9ea3-08248b70aabd
 
-{
-  "message": "ciaone",
-  "accessToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MTEsIm5hbWUiOiJzb25vIHVuIHRlc3QgdXNlciIsImVtYWlsIjoic3Bpbi5mYWJpbzIwQGdtYWlsLmNvbSIsInJvbGUiOiJ1c2VyIiwiaWF0IjoxNzMxNTE2ODYzLCJleHAiOjE3MzE1MTcxNjN9.s5DvITbq0eG00F0T1dFpbkDselmP3_gTUbb1xS8xvRU"
-}
+
+
+###-----------------------------------------------------------------------------------

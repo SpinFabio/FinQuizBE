@@ -1,18 +1,19 @@
 import { Pool, ResultSetHeader, RowDataPacket } from "mysql2/promise";
 import { Request, Response } from "express";
-import generateTokens from "../../utils/auth-token-utils";
-import { UserFE, UserSessionDB } from "../../common/user-interfaces";
+import generateTokens from "../../utils/token-utils";
+import {
+  AuthBodyReqRes,
+  UserFE,
+  UserSessionDB
+} from "../../common/user-interfaces";
 import { setResponseCookies, setSessionEntry } from "./user-utils";
 
-export async function handleSessionRefresh(
+export async function refreshSession(
   req: Request,
   res: Response,
   myPool: Pool
 ): Promise<void> {
   try {
-    console.log(req.cookies);
-    console.log(req.user);
-
     const userFE = {
       id: Number(req.user?.id),
       name: req.user?.name,
@@ -23,6 +24,11 @@ export async function handleSessionRefresh(
     const refreshToken = req.cookies?.refreshToken;
     const user_id = Number(req.user?.id);
 
+    if (!uuid || !refreshToken || !userFE.id) {
+      res.status(400).send("Missing required cookies or user data");
+      return;
+    }
+
     const isRefreshOkay = await isRefreshTokenAllowed(refreshToken, myPool);
     if (!isRefreshOkay) {
       res
@@ -31,28 +37,30 @@ export async function handleSessionRefresh(
       return;
     }
 
+    //console.log(userFE);
+    //console.log(req.cookies);
+
     const isSessionOk = await checkSession(uuid, refreshToken, user_id, myPool);
+
     if (!isSessionOk) {
       res.status(401).send("Session not found you need to login again");
       return;
     }
 
     const tokens = generateTokens(userFE);
-    await invalidateOldRefreshToken(refreshToken, myPool); // qui non c'è bisogno dell' await
-
+    await invalidateOldRefreshToken(refreshToken, myPool);
     const userSession: UserSessionDB = {
       uuid: uuid,
       user_id: userFE.id,
       refreshToken: tokens.refreshToken
     };
-    setSessionEntry(userSession, myPool);
-    console.log(tokens);
-
+    await setSessionEntry(userSession, myPool);
     setResponseCookies(res, uuid, tokens.refreshToken);
-    res.status(200).json({
-      message: "Tokens refresh succesfull!",
+    const responseObj: AuthBodyReqRes = {
+      message: "Tokens refresh successful!",
       accessToken: tokens.accessToken
-    });
+    };
+    res.status(200).json(responseObj);
   } catch (err) {
     console.error("Error: ", err);
     res.status(500).send("Internal server error");
@@ -64,31 +72,13 @@ async function isRefreshTokenAllowed(
   myPool: Pool
 ): Promise<boolean> {
   let [invalidRows] = await myPool.query<RowDataPacket[]>(
-    `
-      SELECT *
-      FROM blacklisted_refresh_tokens
-      WHERE token=?
-    `,
-    [refreshToken]
-  );
-  if (!invalidRows || invalidRows.length > 0) {
-    return false;
-  }
-
-  [invalidRows] = await myPool.query<RowDataPacket[]>(
-    `
-      SELECT *
-      FROM invalid_refresh_tokens
-      WHERE token=?
-    `,
-    [refreshToken]
+    `SELECT * FROM blacklisted_refresh_tokens WHERE token=?
+    UNION
+    SELECT * FROM invalid_refresh_tokens WHERE token=?`,
+    [refreshToken, refreshToken]
   );
 
-  if (!invalidRows || invalidRows.length > 0) {
-    return false;
-  }
-
-  return true;
+  return invalidRows.length === 0;
 }
 
 async function checkSession(
@@ -102,17 +92,14 @@ async function checkSession(
   }
 
   const [rows] = await myPool.query<RowDataPacket[]>(
-    `
-    SELECT * 
+    `SELECT *
     FROM user_sessions
     WHERE 
       uuid = ? AND
       refresh_token = ? AND
-      user_id = ?
-    `,
+      user_id = ?`,
     [uuid, refreshToken, user_id]
   );
-
   return rows.length >= 1;
 }
 
@@ -121,16 +108,14 @@ async function invalidateOldRefreshToken(
   myPool: Pool
 ): Promise<void> {
   const [result] = await myPool.query<ResultSetHeader>(
-    `
-    INSERT INTO invalid_refresh_tokens (token)
-    VALUES (?)
-    `,
+    `INSERT INTO invalid_refresh_tokens (token)
+    VALUES (?)`,
     [oldRefreshToken]
   );
 
   if (result.affectedRows <= 0) {
-    throw new Error("Something went wrong in the refresh token invalidation");
+    throw new Error(
+      `Failed to insert refresh token ${oldRefreshToken} into invalid_refresh_tokens`
+    );
   }
 }
-
-
