@@ -25,7 +25,7 @@ export async function registerNewUser(
 
     const newUserIsOK = await checkUserRegistration(newUser, myPool);
     if (!newUserIsOK) {
-      return res.status(400).send("User already registered");
+      return res.status(409).json({"message":"User already registered"});
     }
 
     const userFE: UserFE = await insertNewUser(newUser, myPool);

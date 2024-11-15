@@ -34,7 +34,7 @@ Cookie: uuid=3a3239c5-0121-4515-9ea3-08248b70aabd
 
 {
   "message": "ciaone",
-  "accessToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MTcsIm5hbWUiOiJGYWJpbyIsImVtYWlsIjoic3Bpbm9sbGkuZmFiaW8za0BnbWFpbC5jb20iLCJyb2xlIjoidXNlciIsImlhdCI6MTczMTU5ODQ5NSwiZXhwIjoxNzMxNTk4Nzk1fQ.1ioM3FExtNHUmJoU69D5KDXO01-s0Qqib367CaQgc40"
+  "accessToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MTcsIm5hbWUiOiJGYWJpbyIsImVtYWlsIjoic3Bpbm9sbGkuZmFiaW8za0BnbWFpbC5jb20iLCJyb2xlIjoidXNlciIsImlhdCI6MTczMTY2NDczMywiZXhwIjoxNzMxNjY1MDMzfQ.JZvhV3M9vwsrMpXszvGYIvS639qU8KOaR6zqFJQvicE"
 }
 
 

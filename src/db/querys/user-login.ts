@@ -31,6 +31,8 @@ export async function loginUser(
   res: Response
 ): Promise<void> {
   try {
+
+    //console.log(req.body)
     const userRequest = req.body as UserRequest;
 
     await userLoginRequestSchema.validate(userRequest, { abortEarly: false });
