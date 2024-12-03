@@ -4,7 +4,7 @@ import {
   MacroTopicRequest,
   macroTopicBaseSchema
 } from "../../common/macro-topic-interfaces";
-import { QuizBase, QuizDB } from "../../common/quiz-interfaces";
+import { QuizBE, QuizDB } from "../../common/quiz-interfaces";
 import { quizDBToQuizFE } from "../../utils/quiz-convert";
 import dotenv from "dotenv";
 import * as Yup from "yup";
@@ -28,7 +28,7 @@ export async function fetchQuizMacroQuery(
     const results: QuizDB[] = [];
     for (const macroTopic of macroTopicRequest.arrayMacrotopic) {
       await macroTopicBaseSchema.validate(macroTopic);
-      if (!macroTopic.isChecked) {
+      if (macroTopic.quantitySelected === 0) {
         continue;
       }
       const quantitySelected = Math.min(
@@ -50,17 +50,16 @@ export async function fetchQuizMacroQuery(
       results.push(...quizzes);
     }
 
-    const resultsForFE: QuizBase[] = [];
+    const resultsForFE: QuizBE[] = [];
     for (const quiz of results) {
       resultsForFE.push(quizDBToQuizFE(quiz)); // Usa la funzione di conversione
     }
 
-    console.log("query macro db finita");
+    //console.log("query macro db finita");
     res.json({
       message: "Ecco qui il risultato della query Macro",
       quizesArray: resultsForFE
     });
-    
   } catch (err) {
     if (err instanceof Yup.ValidationError) {
       return res.status(400).json({ errors: err.errors });

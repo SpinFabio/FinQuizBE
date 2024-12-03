@@ -1,23 +1,27 @@
-import  express  from "express";
-import {Pool} from 'mysql2/promise'
+import express from "express";
+import { Pool } from "mysql2/promise";
 
-export const createTestRouter= (myPool: Pool)=>{
+export const createTestRouter = (myPool: Pool) => {
   const router = express.Router();
 
   router
-    .route('/')
-    .post((req,res)=>{
+    .route("/")
+    .post((_, res) => {
       res.json({
-        'messaggio': 'ecco qui la risposta alla test post '
-      })  
-    })
-    .get((_,res)=>{
-      res.json({ response: {
-          'messaggio':'Ricevuto il messaggio dal client!',
-          'contenuto':'prototipo del contenuto'
-        }
+        accessToken: "token di acessso fittizio",
+        messaggio: "ecco qui la risposta alla test post ",
+        content: "prototipo del contenuto"
       });
     })
+    .get((_, res) => {
+      res.json({
+        response: {
+          accessToken: "token di acessso fittizio",
+          messaggio: "Ricevuto il messaggio dal client!",
+          content: "prototipo del contenuto"
+        }
+      });
+    });
 
-  return router
-}
+  return router;
+};

@@ -1,22 +1,21 @@
-import { QuizBase } from "./quiz-interfaces";
-import * as Yup from 'yup';
-export interface MacroTopicBase{
+import { QuizBE } from "./quiz-interfaces";
+import * as Yup from "yup";
+import { AuthBodyReqRes } from "./user-interfaces";
+export interface MacroTopicBase {
   quantitySelected: number;
   macroID: number;
-  isChecked: boolean;
 }
 
-export interface MacroTopicRequest{
+export interface MacroTopicRequest extends AuthBodyReqRes {
   arrayMacrotopic: MacroTopicBase[];
 }
 
-export interface MacroTopicResponse{
-  quizesArray: QuizBase[];
+export interface MacroTopicResponse {
+  quizesArray: QuizBE[];
 }
 
-
-export const macroTopicBaseSchema= Yup.object({
+export const macroTopicBaseSchema = Yup.object({
   quantitySelected: Yup.number().required(),
   macroID: Yup.number().min(1).max(5).required(),
   isChecked: Yup.boolean()
-})
+});

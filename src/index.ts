@@ -15,9 +15,8 @@ import { createMacroRouter } from "./routes/macro-router";
 import { cerateMicroRouter } from "./routes/micro-router";
 import { cerateUserRouter } from "./routes/user-router";
 import { databaseHealtCheck } from "./utils/database-health-check";
-import cookieParser from 'cookie-parser';
-
-
+import cookieParser from "cookie-parser";
+import { getLocalIPAddress } from "./utils/get-localipADR";
 
 dotenv.config();
 envHealthChecker();
@@ -28,9 +27,13 @@ const PORT = process.env.PORT;
 
 app.use(
   cors({
-    origin: process.env.FE_DOMAIN, // Indica l'origine del frontend
-    methods: ["GET", "POST"], // Specifica i metodi consentiti
-    credentials: true // Permette di inviare cookie o credenziali
+    origin: [
+      process.env.FE_DOMAIN!,
+      "http://192.168.1.109:3000",
+      "http://169.254.5.254:3000/"
+    ],
+    methods: ["GET", "POST"],
+    credentials: true
   })
 );
 app.use(express.json());
@@ -40,7 +43,7 @@ app.use(loggerErrorMiddleware);
 app.use(
   rateLimit({
     windowMs: 60 * 1000,
-    max: 100,
+    max: 50,
     message: "too many request try later"
   })
 );
@@ -81,7 +84,12 @@ app.use("/api/user", cerateUserRouter(myPool));
 app.all("*", (_, res) => {
   res.status(404).send("Route not found");
 });
-app.listen(PORT, () => {
-  console.log(`Server avviato su http://localhost:${PORT}`);
+
+const MY_PC_IP = getLocalIPAddress();
+const SERVER_IP = "192.168.1.109";
+
+app.listen(Number(PORT), SERVER_IP, () => {
+  console.log("IP del mio PC: ", MY_PC_IP);
+  console.log(`Server avviato su http://${SERVER_IP}:${PORT}`);
   console.log(`Server client domain ${process.env.FE_DOMAIN}`);
 });

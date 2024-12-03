@@ -1,14 +1,14 @@
-GET http://localhost:5000/api/user/
+GET http://192.168.1.109:5000/api/user/
 Content-Type: application/json
 
 
 ###----------------------------------------------------------------------------------
-POST http://localhost:5000/api/user/register
+POST http://192.168.1.109:5000/api/user/register
 Content-Type: application/json
 
 {
-  "name": "Fabio",
-  "email": "spinolli.fabio3k@gmail.com",
+  "name": "Fabrizio",
+  "email": "test-email@ciao.com",
   "password": "password",
   "uuid":"3a3239c5-0121-4515-9ea3-08248b70aabd"
 }
@@ -17,7 +17,7 @@ Content-Type: application/json
 
 ###----------------------------------------------------------------------------------
 
-POST http://localhost:5000/api/user/login
+POST http://192.168.1.109:5000/api/user/login
 Content-Type: application/json
 
 {
@@ -28,19 +28,19 @@ Content-Type: application/json
 
 ###----------------------------------------------------------------------------------
 
-POST http://localhost:5000/api/user/verify
+POST http://192.168.1.109:5000/api/user/verify
 Content-Type: application/json
 Cookie: uuid=3a3239c5-0121-4515-9ea3-08248b70aabd
 
 {
   "message": "ciaone",
-  "accessToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MTcsIm5hbWUiOiJGYWJpbyIsImVtYWlsIjoic3Bpbm9sbGkuZmFiaW8za0BnbWFpbC5jb20iLCJyb2xlIjoidXNlciIsImlhdCI6MTczMTY2NDczMywiZXhwIjoxNzMxNjY1MDMzfQ.JZvhV3M9vwsrMpXszvGYIvS639qU8KOaR6zqFJQvicE"
+  "accessToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MTcsIm5hbWUiOiJGYWJpbyIsImVtYWlsIjoic3Bpbm9sbGkuZmFiaW8za0BnbWFpbC5jb20iLCJyb2xlIjoidXNlciIsImlhdCI6MTczMjYzOTgwOCwiZXhwIjoxNzMyNjQwMTA4fQ.qNHdZS33DehTk2zahzD-KDlcZrJV7TVpqxC0P9vHnek"
 }
 
 
 ###----------------------------------------------------------------------------------
 
-GET http://localhost:5000/api/user/refresh
+GET http://192.168.1.109:5000/api/user/refresh
 Content-Type: application/json
 Cookie: uuid=3a3239c5-0121-4515-9ea3-08248b70aabd
 

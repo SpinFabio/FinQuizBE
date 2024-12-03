@@ -1,14 +1,14 @@
-POST http://localhost:5000/api/macro
+POST http://192.168.1.109:5000/api/micro
 Content-Type: application/json
 
 {
   "arrayMicroTopic": [
-    { "quantitySelected": 3, "macroID": 1, "microID": 101, "isChecked": true },
-    { "quantitySelected": 5, "macroID": 2, "microID": 201, "isChecked": false },
-    { "quantitySelected": 6, "macroID": 3, "microID": 302, "isChecked": true },
-    { "quantitySelected": 4, "macroID": 4, "microID": 404, "isChecked": false },
-    { "quantitySelected": 4, "macroID": 4, "microID": 405, "isChecked": false },
-    { "quantitySelected": 2, "macroID": 5, "microID": 508, "isChecked": true },
-    { "quantitySelected": 2, "macroID": 5, "microID": 509, "isChecked": true }
+    { "quantitySelected": 3, "macroID": 1, "microID": 101  },
+    { "quantitySelected": 5, "macroID": 2, "microID": 201  },
+    { "quantitySelected": 6, "macroID": 3, "microID": 302  },
+    { "quantitySelected": 4, "macroID": 4, "microID": 404  },
+    { "quantitySelected": 4, "macroID": 4, "microID": 405  },
+    { "quantitySelected": 2, "macroID": 5, "microID": 508  },
+    { "quantitySelected": 2, "macroID": 5, "microID": 509 }
   ]
 }

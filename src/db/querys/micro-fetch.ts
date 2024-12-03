@@ -6,7 +6,7 @@ import {
   MicroTopicResponse,
   microTopicBaseSchema
 } from "../../common/micro-topic-interfaces";
-import { QuizBase, QuizDB } from "../../common/quiz-interfaces";
+import { QuizBE, QuizDB } from "../../common/quiz-interfaces";
 import { quizDBToQuizFE } from "../../utils/quiz-convert";
 import * as Yup from "yup";
 import dotenv from "dotenv";
@@ -29,7 +29,7 @@ export async function fetchQuizMicroQuery(
     const results: QuizDB[] = [];
     for (const microTopic of microTopicRequest.arrayMicroTopic) {
       await microTopicBaseSchema.validate(microTopic, { abortEarly: false });
-      if (!microTopic.isChecked) {
+      if (!(microTopic.quantitySelected > 0)) {
         continue;
       }
       const quantitySelected = Math.min(
@@ -51,9 +51,7 @@ export async function fetchQuizMicroQuery(
       results.push(...quizzes);
     }
 
-    const resultsForFE: QuizBase[] = results.map((quiz) =>
-      quizDBToQuizFE(quiz)
-    );
+    const resultsForFE: QuizBE[] = results.map((quiz) => quizDBToQuizFE(quiz));
 
     res.json({
       message: "ecco qui il risultato ella query micro",

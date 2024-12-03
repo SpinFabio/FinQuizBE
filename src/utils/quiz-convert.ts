@@ -1,6 +1,6 @@
-import { QuizBase, QuizDB } from "../common/quiz-interfaces";
+import { QuizBE, QuizDB } from "../common/quiz-interfaces";
 
-export function quizDBToQuizFE(quizDB: QuizDB): QuizBase {
+export function quizDBToQuizFE(quizDB: QuizDB): QuizBE {
   return {
     macroTopicID: quizDB.macroTopicId,
     microTopicID: quizDB.microTopicId,
